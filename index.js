@@ -27,7 +27,6 @@ app.get("/", function(req, res){
     res.render("anasayfa", {sozler : gelenSozler});
   });
 });
-
 app.route("/api/guzelsoz/:id")
     .get(function(req, res){
       GuzelSoz.findOne({_id : req.params.id} , function(err, gelenVeri){
@@ -65,7 +64,6 @@ app.route("/api/guzelsoz/:id")
         res.send({sonuc : "Şifre hatalı."});
       }
     });
-
 app.route("/api/guzelsozler")
     .get(function(req, res){
       GuzelSoz.find({}, function(err, gelenVeri){
@@ -100,36 +98,44 @@ app.route("/api/guzelsozler")
         res.send({sonuc : "Şifre hatalı."});
       }
     });
-
-
-    app.get("/admin", function(req, res){
-        // 1. Alternatif
-        /*GuzelSoz.find({}, function(err, gelenGuzelSozler){
-          res.render("admin", {guzelsozler : gelenGuzelSozler});
-        })*/
-        var link = "https://rumi-quotes.herokuapp.com/api/guzelsoz";
-        https.get(link , function(response){
-          response.on("data", function(gelenGuzelSozler){
-            // gelenGuzelSozler -> byte türünde gelmişti.
-            var guzelSozler = JSON.parse(gelenGuzelSozler);
-            res.send(guzelSozler);
-          })
-        });
+app.get("/admin", function(req, res){
+    // 1. Alternatif
+    /*GuzelSoz.find({}, function(err, gelenGuzelSozler){
+      res.render("admin", {guzelsozler : gelenGuzelSozler});
+    })*/
+    var link = "https://rumi-quotes.herokuapp.com/api/guzelsozler";
+    https.get(link , function(response){
+      response.on("data", function(gelenGuzelSozler){
+        // gelenGuzelSozler -> byte türünde gelmişti.
+        var guzelSozler = JSON.parse(gelenGuzelSozler);
+        res.render("admin", { sozler : guzelSozler } );
+      })
     });
+});
+//https://guzelsozler.herokuapp.com/api/guzelsoz/600c683c986f50001534a062
+app.post("/kayit-sil", function(req, res){
+    var id = req.body._id;
+    var link = "https://rumi-quotes.herokuapp.com/api/guzelsoz/"+id;
+    const gonderilecekler = JSON.stringify({
+      sifre: 'parola1234'
+    })
+    const secenekler = {
+      method: 'DELETE',
+      headers: {
+        'Content-type': 'application/json',
+        'Content-Length': gonderilecekler.length
+      }
+    }
+    const baglanti = https.request(link, secenekler, function(response) {
+      response.on('data', function(gelenVeri) {
+        var sonuc = JSON.parse(gelenVeri);
+        res.send(sonuc);
+      })
+    })
+    baglanti.write(gonderilecekler);
+    baglanti.end();
+});
 
-    app.post("/kayit-sil", function(req, res){
-        var id = req.body._id;
-        var link = "https://rumi-quotes.herokuapp.com/api/guzelsoz/"+id;
-        var secenekler = {
-          method : 'DELETE'
-        };
-        https.get(link, secenekler , function(response){
-            response.on("data", function(gelenData){
-              var sonuc = JSON.parse(gelenData);
-              res.send(sonuc)
-            })
-        });
-    });
 
 let port = process.env.PORT;
 if(port == "" || port == null){
