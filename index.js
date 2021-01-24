@@ -53,7 +53,7 @@ app.route("/api/guzelsoz/:id")
     })
     .delete(function(req, res){
       var sifre = req.body.sifre;
-      if(sifre == "parola1234"){
+      if(sifre == "1234"){
         GuzelSoz.deleteOne({_id : req.params.id}, function(err){
           if(!err)
             res.send({sonuc : "Kayıt başarıyla silindi."});
@@ -87,7 +87,7 @@ app.route("/api/guzelsozler")
     })
     .delete(function(req, res){
       var sifre = req.body.sifre;
-      if(sifre == "parola1234"){
+      if(sifre == "1234"){
         GuzelSoz.deleteMany({}, function(err){
           if(!err)
             res.send( {sonuc : "Tüm kayıtlar başarıyla silindi."} );
@@ -117,7 +117,7 @@ app.post("/kayit-sil", function(req, res){
     var id = req.body._id;
     var link = "https://rumi-quotes.herokuapp.com/api/guzelsoz/"+id;
     const gonderilecekler = JSON.stringify({
-      sifre: 'parola1234'
+      sifre: "1234"
     })
     const secenekler = {
       method: 'DELETE',
